@@ -12,38 +12,48 @@ var connection = mysql.createConnection({
 
 connection.connect();
  
-connection.query('SELECT item_id, product_name, price FROM products', function (error, results, fields) {
-  if (error) throw error;
-  // console.log('The solution is: ', results);
-  for (var i = 0; i < results.length; i++) {
-  	console.log("----------------------------------------------------------------");
-  	console.log("Product Name: " + results[i].product_name);
-  	console.log("Price: " + results[i].price);
-  	console.log("Product ID: " + results[i].item_id);
-  	console.log("================================================================");
-  };
-});
+connection.query('SELECT * FROM products', function (error, results, fields) {
+  
+  	if (error) throw error;
+  
+	for (var i = 0; i < results.length; i++) {
+  		console.log("----------------------------------------------------------------");
+  		console.log("Product Name: " + results[i].product_name);
+  		console.log("Price: " + results[i].price);
+  		console.log("Product ID: " + results[i].item_id);
+  		console.log("================================================================");
+	};
 
-inquirer.prompt([
 
-	{
-		type: "input",
-		message: "What is the ID of the item you would like to buy?",
-		name: "ID"
-	},	
+	inquirer.prompt([
 
-	{
-		type: "input",
-		message: "How many would you like to buy?",
-		name: "quantity"
-	}
+		{
+			type: "input",
+			message: "What is the ID of the item you would like to buy?",
+			name: "ID"
+		},	
 
-]).then(function(answers){
+		{
+			type: "input",
+			message: "How many would you like to buy?",
+			name: "quantity"
+		}
 
-	console.log(answers);
-	console.log(answers.ID);
-	console.log(answers.quantity);
+	]).then(function(answers){
 
-});
+		var itemID = answers.ID;
+		var quantity = answers.quantity;
+
+		if (results[itemID-1].stock_quantity < quantity){
+			console.log("Insufficient quantity!");
+		} else if (results[itemID-1].stock_quantity >= quantity) {
+			console.log("Right away sir!");
+		} else {
+			console.log("There is some problem with the quantity check!");
+		}
+
+	});
  
+
+});
 connection.end();
