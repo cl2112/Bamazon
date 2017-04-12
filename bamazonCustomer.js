@@ -48,6 +48,7 @@ connection.query('SELECT * FROM products', function (error, results, fields) {
 			console.log("Insufficient quantity!");
 		} else if (results[itemID-1].stock_quantity >= quantity) {
 			console.log("Right away sir!");
+			
 		} else {
 			console.log("There is some problem with the quantity check!");
 		}
