@@ -1,12 +1,14 @@
+//------------------------------------------------------------------------------------
+// Requires
+
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 
+//====================================================================================
 
-function updateDatabase() {
-	connection.query('Update');
-};
 
-// console.log("hello!");
+//------------------------------------------------------------------------------------
+// Establishing the Connection Variables
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -15,26 +17,54 @@ var connection = mysql.createConnection({
   database : 'bamazon'
 });
 
+// Starting the connection 
+connection.connect();
+
+//====================================================================================
+
+
+//-------------------------------------------------------------------------------------
+// function to update the database based on the customers request
 
 function buyItem(itemID, stock, quantity){
-	connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?')
-}
+	var newStock = stock - quantity;
+	connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ? AND stock_quantity = ?', [newStock, itemID, stock], function(error, results){
+		if (error) throw error;
+		console.log("Transaction Complete!");
+		displayItems();
+	});
+};
+
+//=====================================================================================
 
 
-connection.connect();
- 
-connection.query('SELECT * FROM products', function (error, results, fields) {
-  
-  	if (error) throw error;
-  
-	for (var i = 0; i < results.length; i++) {
-  		console.log("----------------------------------------------------------------");
-  		console.log("Product Name: " + results[i].product_name);
-  		console.log("Price: " + results[i].price);
-  		console.log("Product ID: " + results[i].item_id);
-  		console.log("================================================================");
-	};
+//--------------------------------------------------------------------------------------------
+// Displays the items from the database
 
+function displayItems() {
+	connection.query('SELECT * FROM products', function (error, results, fields) {
+	  
+	  	if (error) throw error;
+	  
+		for (var i = 0; i < results.length; i++) {
+	  		console.log("----------------------------------------------------------------");
+	  		console.log("Product Name: " + results[i].product_name);
+	  		console.log("Price: " + results[i].price);
+	  		console.log("Product ID: " + results[i].item_id);
+	  		console.log("================================================================");
+		};
+
+		customerStart(results);
+	});
+};
+
+//=========================================================================================
+
+
+//--------------------------------------------------------------------------------------
+//  Displays the prompt for the customers order and passes in the results from displayItems() to avoid extra queries
+
+function customerStart(results) {
 
 	inquirer.prompt([
 
@@ -55,19 +85,23 @@ connection.query('SELECT * FROM products', function (error, results, fields) {
 		var itemID = answers.ID;
 		var quantity = answers.quantity;
 		var stock = results[itemID-1].stock_quantity;
+		var price = results[itemID-1].price;
 
 		if (stock < quantity){
 			console.log("Insufficient quantity!");
+			// customerStart();
 		} else if (stock >= quantity) {
-			console.log("Right away sir!");
+			console.log("Your total is $" + quantity * price);
 			buyItem(itemID, stock, quantity);
-
 		} else {
 			console.log("There is some problem with the quantity check!");
 		}
 
 	});
- 
+};
 
-});
-connection.end();
+//========================================================================================
+
+
+// Starts the function chain
+displayItems();
