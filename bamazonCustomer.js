@@ -89,7 +89,7 @@ function customerStart(results) {
 
 		if (stock < quantity){
 			console.log("Insufficient quantity!");
-			// customerStart();
+			displayItems();
 		} else if (stock >= quantity) {
 			console.log("Your total is $" + quantity * price);
 			buyItem(itemID, stock, quantity);
