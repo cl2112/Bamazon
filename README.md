@@ -1,5 +1,6 @@
 # Bamazon
-
+A CLI node.js app that connects to a MySQL database.
+The app simulates an online store where customers can purchase items, and their purchases change the data stored in the databse.
 
 # Demo
 
